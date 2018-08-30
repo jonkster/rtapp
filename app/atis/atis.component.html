@@ -1,0 +1,92 @@
+<StackLayout>
+	<StackLayout orientation="horizontal" >
+		<Label class="p-10" text="Select Location" textWrap="true"></Label>
+		<StackLayout class="p-10" *ngFor="let option of knownAds">
+		    <StackLayout orientation="horizontal" verticalAlignment="center">
+			<CheckBox #elemLoc [checked]="getAd() === option" class="checkbox"
+				  (checkedChange)="adChange(elemLoc, option)" boxType="circle"></CheckBox>
+			<StackLayout verticalAlignment="center">
+			    <Label [text]="option" textWrap="true"></Label>
+			</StackLayout>
+		    </StackLayout>
+		</StackLayout>
+	</StackLayout>
+
+
+	<StackLayout orientation="horizontal" >
+		<Label class="p-10" text="Select Degree of difficulty" textWrap="true"></Label>
+		<StackLayout class="p-10" *ngFor="let option of userService.getKnownDifficulty()">
+		    <StackLayout orientation="horizontal" verticalAlignment="center">
+			<CheckBox #elem [checked]="getDifficulty() === option" class="checkbox"
+				  (checkedChange)="difficultyChange(elem, option)" boxType="circle"></CheckBox>
+			<StackLayout verticalAlignment="center">
+			    <Label [text]="option" textWrap="true"></Label>
+			</StackLayout>
+		    </StackLayout>
+		</StackLayout>
+	</StackLayout>
+
+	<StackLayout orientation="horizontal" verticalAlignment="center">
+	        <Label class="label font-weight-bold" text="Speak ATIS" textWrap="true" row="0" col="0"></Label>
+                                <Switch class="m-15" [checked]="getSpeech()" (checkedChange)="toggleSpeech($event)" row="0" col="1"></Switch>
+		<Button width="200" height="50" class="btn btn-primary" text="Get New ATIS"
+						 (tap)="atis(true)"></Button>
+		<Button width="200" height="50" class="btn btn-primary" text="Repeat ATIS"
+						 (tap)="atis(false)"></Button>
+	</StackLayout>
+
+	<StackLayout orientation="vertical" >
+		<StackLayout orientation="horizontal">
+		    <Label text="ATIS CODE "></Label>
+		    <Label [text]="'&nbsp;' + ident + '&nbsp;'" class="rounded" *ngIf="ident !== ''"></Label>
+		</StackLayout>
+		<StackLayout orientation="horizontal">
+		    <Label text="RUNWAY"></Label>
+		    <Label [text]="'&nbsp;' + rwys + '&nbsp;'" class="pencil" *ngIf="rwys !== ''"></Label>
+		</StackLayout>
+		<StackLayout orientation="horizontal">
+		    <Label text="WIND"></Label>
+		    <Label [text]="'&nbsp;' + wind + '&nbsp;'" class="pencil" *ngIf="wind !== ''"></Label>
+		</StackLayout>
+		<StackLayout orientation="horizontal">
+		    <Label text="VISIBILITY"></Label>
+		    <Label [text]="'&nbsp;' + vis + '&nbsp;'" class="pencil" *ngIf="vis !== ''"></Label>
+		</StackLayout>
+		<StackLayout orientation="horizontal">
+		    <Label text="WEATHER"></Label>
+		</StackLayout>
+		<StackLayout orientation="horizontal">
+		    <Label text="QNH"></Label>
+		</StackLayout>
+		<StackLayout orientation="horizontal">
+		    <Label text="OTHER DETAILS"></Label>
+		</StackLayout>
+	</StackLayout>
+
+
+	<Button width="200" height="50" class="btn btn-primary" text="Test Yourself"
+					 (tap)="testCopy()"></Button>
+
+
+	<StackLayout>
+		<StackLayout class="p-10" *ngFor="let option of answeredQuestions">
+		    <StackLayout orientation="horizontal" verticalAlignment="center">
+			    <Label [text]="option" textWrap="true"></Label>
+		    </StackLayout>
+		</StackLayout>
+	</StackLayout>
+	
+
+	<!--<StackLayout>
+		<Label class="p-10" text="Select Airspace to practice" textWrap="true"></Label>
+		<StackLayout class="p-10" *ngFor="let option of userService.getKnownAirspace()">
+		    <StackLayout orientation="horizontal" verticalAlignment="center">
+			<CheckBox #elem [checked]="getAirspace() === option" class="checkbox"
+				  (checkedChange)="airspaceChange(elem, option)" boxType="circle"></CheckBox>
+			<StackLayout verticalAlignment="center">
+			    <Label [text]="'Class ' + option" textWrap="true"></Label>
+			</StackLayout>
+		    </StackLayout>
+		</StackLayout>
+	</StackLayout>-->
+</StackLayout>
