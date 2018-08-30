@@ -1,6 +1,7 @@
 import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptModule } from "nativescript-angular/nativescript.module";
 import { TNSCheckBoxModule } from 'nativescript-checkbox/angular';
+import { TNSFontIconModule } from 'nativescript-ng2-fonticon';
 import { AppRoutingModule } from "./app.routing";
 
 import { AppComponent } from "./app.component";
@@ -26,6 +27,7 @@ import { NativeScriptFormsModule } from "nativescript-angular/forms";
     imports: [
         NativeScriptModule,
 	TNSCheckBoxModule,
+        TNSFontIconModule.forRoot({ 'mdi': 'material-design-icons.css' }),
        	AppRoutingModule
     ],
     declarations: [
