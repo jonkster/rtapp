@@ -33,33 +33,38 @@
 						 (tap)="atis(true)"></Button>
 		<Button width="200" height="50" class="btn btn-primary" text="Repeat ATIS"
 						 (tap)="atis(false)"></Button>
+		<Button width="200" height="50" class="btn btn-primary" text="Cheat"
+						 (tap)="cheat = ! cheat"></Button>
 	</StackLayout>
 
 	<StackLayout orientation="vertical" >
 		<StackLayout orientation="horizontal">
-		    <Label text="ATIS CODE "></Label>
-		    <Label [text]="'&nbsp;' + ident + '&nbsp;'" class="rounded" *ngIf="ident !== ''"></Label>
+		    <Label text="ATIS CODE " *ngIf="!cheat"></Label>
+		    <Label [text]="'&nbsp;' + ident + '&nbsp;'" class="rounded" *ngIf="cheat && ident !== ''"></Label>
+		</StackLayout>
+	        <Label [text]="'&nbsp;' + approach + '&nbsp;'" class="pencil" *ngIf="cheat && approach !== ''"></Label>
+		<StackLayout orientation="horizontal">
+		    <Label text="RUNWAY" *ngIf="!cheat"></Label>
+		    <Label [text]="'&nbsp;R' + rwys + '&nbsp;'" class="pencil" *ngIf="cheat && rwys !== ''"></Label>
 		</StackLayout>
 		<StackLayout orientation="horizontal">
-		    <Label text="RUNWAY"></Label>
-		    <Label [text]="'&nbsp;' + rwys + '&nbsp;'" class="pencil" *ngIf="rwys !== ''"></Label>
+		    <Label text="WIND" *ngIf="!cheat"></Label>
+		    <Label [text]="'&nbsp;' + wind + '&nbsp;'" class="pencil" *ngIf="cheat && wind !== ''"></Label>
 		</StackLayout>
 		<StackLayout orientation="horizontal">
-		    <Label text="WIND"></Label>
-		    <Label [text]="'&nbsp;' + wind + '&nbsp;'" class="pencil" *ngIf="wind !== ''"></Label>
+		    <Label text="VISIBILITY" *ngIf="!cheat"></Label>
+		    <Label [text]="'&nbsp;' + vis + '&nbsp;'" class="pencil" *ngIf="cheat && vis !== ''"></Label>
 		</StackLayout>
 		<StackLayout orientation="horizontal">
-		    <Label text="VISIBILITY"></Label>
-		    <Label [text]="'&nbsp;' + vis + '&nbsp;'" class="pencil" *ngIf="vis !== ''"></Label>
+		    <Label text="WEATHER" *ngIf="!cheat"></Label>
+		    <Label [text]="'&nbsp;' + weather + '&nbsp;'" class="pencil" *ngIf="cheat && weather !== ''"></Label>
 		</StackLayout>
 		<StackLayout orientation="horizontal">
-		    <Label text="WEATHER"></Label>
+		    <Label text="QNH" *ngIf="!cheat"></Label>
+		    <Label [text]="'&nbsp;' + qnh + '&nbsp;'" class="pencil" *ngIf="cheat && qnh !== ''"></Label>
 		</StackLayout>
 		<StackLayout orientation="horizontal">
-		    <Label text="QNH"></Label>
-		</StackLayout>
-		<StackLayout orientation="horizontal">
-		    <Label text="OTHER DETAILS"></Label>
+		    <Label [text]="'&nbsp;' + other + '&nbsp;'" class="pencil" *ngIf="cheat && other !== ''"></Label>
 		</StackLayout>
 	</StackLayout>
 

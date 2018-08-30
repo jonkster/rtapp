@@ -9,6 +9,7 @@ import { AerodromesService } from "../aerodromes/aerodromes.service";
 export class CommonAtisService {
 
   private ident: string = '';
+  private approach: string = '';
 
 
   constructor(private weatherService: WeatherService,
@@ -18,6 +19,16 @@ export class CommonAtisService {
 
   public getCurrentIdent() {
 	  return this.ident;
+  }  
+
+  private shorthand(st: string): string {
+  	st = st.replace(/instrument/ig, 'inst');
+  	st = st.replace(/approach/ig, 'app');
+  	return st;
+  }
+
+  public getCurrentApproach() {
+	  return this.shorthand(this.approach);
   }  
 
   public getCurrentRunways() {
@@ -41,12 +52,29 @@ export class CommonAtisService {
   	return this.weatherService.visAsShorthand();
   }
 
+  public getCurrentWeather() {
+  	return this.weatherService.wxAsShorthand();
+  }
+
+  public getCurrentCloud() {
+  	return this.weatherService.cloudAsShorthand();
+  }
+
+  public getCurrentQNH() {
+  	return this.weatherService.qnhAsShorthand();
+  }
+
+  public getCurrentOther() {
+  	return this.aerodromesService.getCurrentOther();
+  }
+
   public generateAtis(level: string) : string {
   	let wx:Weather = this.weatherService.createNewWeather();
   	let adName = this.aerodromesService.getName();
   	this.aerodromesService.setWind(wx.windDirection, wx.windStrength);
   	let ident = this.getIdent();
   	let atis: string[] = [];
+	this.approach = '';
 
 	this.questionService.clearQuestions();
 	this.questionService.addQuestion('what information have you received?', ident, ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot'], '');
@@ -54,13 +82,17 @@ export class CommonAtisService {
 	atis.push(adName);	
 	atis.push('terminal information');	
 	atis.push(ident);	
+	this.aerodromesService.setNoCircuits(false);
 	if (this.weatherService.isIMC()) {
+		this.approach = 'instrument approach';
 		atis.push('expect instrument approach');
 		this.questionService.addQuestion('If arriving, what sort of approach would you expect?', "instrument", ['visual', 'special vfr', 'standard', 'cannot be determined'], 'atis says expect instrument approach');
 		if (this.aerodromesService.getAllowSpecialVFR()) {
 			if (this.weatherService.isRVFR()) {
 				this.questionService.addQuestion('For fixed wing VFR aircraft, what is the minimum visibilty you should maintain?', "1600m", ['800m', '2000m', '5000m', '8km', 'none - you cannot operate VFR'], 'special VFR procedures - you must maintain 1600m visibility');
 				atis.push('special V F R procedures apply')
+				this.approach += ' spec vfr';
+				this.aerodromesService.setNoCircuits(true);
 			}
 		}
 	} else {
@@ -68,7 +100,9 @@ export class CommonAtisService {
 	}
 	if (this.aerodromesService.getAllowSpecialVFR()) {
 		if (! this.weatherService.isVFR()) {
+			this.aerodromesService.setNoCircuits(true);
 			atis.push('control zone closed for V F R operations');
+			this.approach += ' no vfr';
 			this.questionService.addQuestion('For fixed wing VFR aircraft, what is the minimum visibilty you should maintain?', "none - you cannot operate VFR", ['800m', '2000m', '5000m', '8km', 'none - you cannot operate VFR'], 'the zone is closed for VFR operations');
 		}
 	}

@@ -23,9 +23,13 @@ export class AtisComponent implements OnInit, OnDestroy {
 
 	private subscriptions: any;
 	private ident: string = '';
+	private approach: string = '';
 	private rwys: string = '';
 	private vis: string = '';
 	private wind: string = '';
+	private weather: string = '';
+	private qnh: string = '';
+	private other: string = '';
 
 	private knownAds: string[] = [];
 	private answeredQuestions: string[] = [];
@@ -42,6 +46,7 @@ export class AtisComponent implements OnInit, OnDestroy {
 	private currentAtis: string = '';
 	private stopQuestions: boolean = false;
 	private speech: boolean = true;
+	private cheat: boolean = false;
 
 	constructor(private atisService: CommonAtisService,
 			 private aerodromesService: AerodromesService,
@@ -88,6 +93,7 @@ export class AtisComponent implements OnInit, OnDestroy {
 	}
 
 	public atis(getNew: boolean) {
+		this.cheat = false;
 		this.answeredQuestions = [];
 		let airspace = this.userService.getCurrentAirspace();
 		let level = this.userService.getCurrentDifficulty();
@@ -95,9 +101,15 @@ export class AtisComponent implements OnInit, OnDestroy {
 			this.currentAtis = this.atisService.generateAtis(level);
 		}
 		this.ident = this.atisService.getCurrentIdent();
+		this.approach = this.atisService.getCurrentApproach();
 		this.rwys = this.atisService.getCurrentRunways().replace(/ and /g, '+');
 		this.wind = this.atisService.getCurrentWind();
+		this.wind += ' ' + this.aerodromesService.getMaxXwindAsShorthand();
 		this.vis = this.atisService.getCurrentVis();
+		this.weather = this.atisService.getCurrentWeather();
+		this.weather += ' ' + this.atisService.getCurrentCloud();
+		this.qnh = this.atisService.getCurrentQNH();
+		this.other = this.atisService.getCurrentOther();
 		console.log(this.rwys);
 		switch(level) {
 			case 'advanced': 
@@ -163,7 +175,7 @@ export class AtisComponent implements OnInit, OnDestroy {
 		let question = this.questionService.getNextQuestion();
 		if (question === undefined) {
 			this.stopQuestions = true;
-			alert("no more questions");
+			this.cheat = true;
 			return;
 		}
 		this.stopQuestions = false;

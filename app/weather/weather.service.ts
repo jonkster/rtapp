@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { TNSFontIconService } from 'nativescript-ng2-fonticon';
 import { Weather, Cloud } from './weather.interface';
 
 @Injectable()
@@ -8,9 +9,9 @@ private wx: Weather = {} as any;
 
   public qnhNumber: number = 1013;
 
-  constructor() {
+  constructor(private fonticon: TNSFontIconService) {
  	this.createNewWeather();
-       	}
+  }
 
   public createNewWeather(): Weather {
   	this.generateWx();
@@ -254,7 +255,8 @@ private wx: Weather = {} as any;
 	}
 
 	if (this.wx.vis.max > this.wx.vis.min) {
-		v += ' &#9824; ';
+	console.log(this.fonticon.css.mdi['mdi-add']);
+		v += "↓";
   		if (this.wx.vis.min === 9999) {
 			v += ' >10k';
 		} else if (this.wx.vis.min > 5000) {
@@ -266,6 +268,53 @@ private wx: Weather = {} as any;
 	}
 	return v;
    }
+
+   public shorthand(st: string): string {
+   	st = st.replace(/thunderstorms/ig, 'ts');
+   	st = st.replace(/showers/ig, 'shwrs');
+   	st = st.replace(/ of /ig, ' ');
+   	st = st.replace(/rain/ig, 'rn');
+   	st = st.replace(/in area/ig, 'area');
+   	st = st.replace(/fog/ig, 'fg');
+   	st = st.replace(/smoke/ig, 'fu');
+   	st = st.replace(/mist/ig, 'br');
+   	st = st.replace(/isolated/ig, 'isol');
+   	st = st.replace(/broken/ig, 'bkn');
+   	st = st.replace(/scattered/ig, 'sct');
+   	st = st.replace(/overcast/ig, 'ovc');
+	return st;
+   }
+
+  public cloudAsShorthand(): string {
+  	if (this.wx.cloud.length === 0) {
+		return '';
+		}
+  	else if (this.isCAVOK()) {
+		return '';
+	} else {
+		let st = '';
+		for (let i = 0; i < this.wx.cloud.length; i++) {
+			let cloud: Cloud = this.wx.cloud[i];
+			st += ' ' + this.oktasToString(cloud.coverage) + ' ' + cloud.base;
+		}
+		st = this.shorthand(st);
+		return st;
+	}
+  }
+
+  public qnhAsShorthand(): string {
+  	return 'Q' + this.qnhNumber.toString();
+  }
+
+  public wxAsShorthand(): string {
+  	let wx = '';
+	if (this.wx.wx.length > 0) {
+		wx = this.wx.wx.join(', ');
+	}
+	wx = this.shorthand(wx);
+	console.log(wx);
+	return wx;
+  }
 
   windAsShorthand(): string {
   	let wind = ''

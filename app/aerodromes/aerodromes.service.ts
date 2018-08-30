@@ -5,6 +5,8 @@ import { Weather, Cloud } from '../weather/weather.interface';
 @Injectable()
 export class AerodromesService {
 
+  private specs: string = '';
+
   private knownAds: any = {
   	'YSSY': {
 		name: 'Sydney',
@@ -188,12 +190,20 @@ export class AerodromesService {
   private departures = '';
   private circuits = '';
   private circuitsLikely: boolean = false;
+  private noCircuits: boolean = false;
 
   constructor() { }
 
   setAd(ad: string) {
   	this.ad = ad;
   	this.circuitsLikely = this.knownAds[this.ad].circuitsLikely;
+  	this.maxXwind = 0;
+	this.arrivals = '';
+	this.departures = '';
+	this.circuits = '';
+  	this.rcount = 0;
+  	this.windDir = 0;
+	this.windStrength = 0;
   }
 
   setWind(windDir: number, windStrength: number) {
@@ -206,6 +216,14 @@ export class AerodromesService {
 
   setWx(wx: Weather) {
   	this.wx = wx;
+  	this.maxXwind = 0;
+	this.arrivals = '';
+	this.departures = '';
+	this.circuits = '';
+  	this.rcount = 0;
+  	this.windDir = 0;
+	this.windStrength = 0;
+  	this.noCircuits = false;
   }
 
   getName() {
@@ -226,6 +244,10 @@ export class AerodromesService {
   	return this.circuits;
   }
 
+  getCurrentOther(): string {
+  	return this.specs;
+  }
+
   getSpecialities() : string[] {
   	let res: string[] = [];
   	let specs = this.knownAds[this.ad].localSpecialities;
@@ -239,7 +261,37 @@ export class AerodromesService {
 			}
 		}
 	}
+	this.specs = this.shorthand(res.join(', '));
 	return res;
+  }
+
+  shorthand(st: string) : string {
+  	st = st.replace(/domestic/ig, 'dom');
+  	st = st.replace(/departures/ig, 'deps');
+  	st = st.replace(/arrivals/ig, 'arr');
+  	st = st.replace(/wollongong/ig, 'WOL');
+  	st = st.replace(/expect/ig, 'xpt');
+  	st = st.replace(/runway/ig, 'rwy');
+  	st = st.replace(/one/ig, '1');
+  	st = st.replace(/two/ig, '2');
+  	st = st.replace(/three/ig, '3');
+  	st = st.replace(/for/ig, '4');
+  	st = st.replace(/four/ig, '4');
+  	st = st.replace(/five/ig, '5');
+  	st = st.replace(/fife/ig, '5');
+  	st = st.replace(/six/ig, '6');
+  	st = st.replace(/seven/ig, '7');
+  	st = st.replace(/seffen/ig, '7');
+  	st = st.replace(/eight/ig, '8');
+  	st = st.replace(/niner/ig, '9');
+  	st = st.replace(/zero/ig, '0');
+  	st = st.replace(/left/ig, 'L');
+  	st = st.replace(/right/ig, 'R');
+	return st;
+  }
+
+  setNoCircuits(v: boolean) {
+  	this.noCircuits = v;
   }
 
   weatherHas(wx: string) : boolean {
@@ -278,6 +330,7 @@ export class AerodromesService {
 	let rwysSt: string[] = [];
   	let rwys = this.knownAds[this.ad].runways;
 	this.arrivals = this.departures = this.circuits = '';
+  	this.maxXwind = 0;
 	for (let i = 0; i < rwys.length; i++) {
 		let rwy = rwys[i];
 		let relAng = Math.abs(rwy.dir - this.windDir);
@@ -306,8 +359,11 @@ export class AerodromesService {
 			}
 		}
 	}
-	if ((this.circuits === '') && (this.circuitsLikely)) {
+	if ((this.circuits === '') && (this.circuitsLikely) && (! this.noCircuits)) {
 		this.circuits = this.arrivals;
+	}
+	if (this.noCircuits) {
+		this.circuits = '';
 	}
 	this.rcount = rwysSt.length;
 	return rwysSt.join(', ');
@@ -326,7 +382,15 @@ export class AerodromesService {
 	return xWind;
   }
 
-  getMaxXwind() {
+  getMaxXwindAsShorthand(): string {
+  	if (this.maxXwind >= 7) {
+  		return 'xw' + this.maxXwind.toString();
+	} else {
+  		return '';
+	}
+  }
+
+  getMaxXwind(): number {
   	return this.maxXwind;
   }
 
