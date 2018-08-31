@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Weather, Cloud } from '../weather/weather.interface';
+import { WeatherService } from '../weather/weather.service';
 
 
 @Injectable()
@@ -11,8 +12,10 @@ export class AerodromesService {
   	'YSSY': {
 		name: 'Sydney',
 		services: ['tower', 'ground', 'approach'],
+		imcApproach: 'ILS approach',
 		allowSpecialVFR: false,
 		circuitsLikely: false,
+		runways: ['16L, 16R', '34L, 34R', '07', '25'],
 		localSpecialities: [
 			{
 	       			item: 'Cumulonimbus and lightning observed to the south. waterspout observed to east',
@@ -39,26 +42,72 @@ export class AerodromesService {
 				prob: 0.40
 			},
 		],
-		runways: [
-			{
-				'name': 'three four left and right',
-				'sname': '34L and 34R',
-				'dir': 340,
-				'extra': 'for arrivals and departures parallel runway operations in progress independent departures in progress'
-			},
-			{
-				'name': 'one six left and right',
-				'sname': '16L and 16R',
-				'dir': 160,
-				'extra': 'for arrivals and departures parallel runway operations in progress independent departures in progress'
+		runwayLogic: function(winddir: number, windstrength: number, service: any): [string, string, string] { 
+			let rwy = '';
+			let std = 'for arrivals and departures';
+			let stdParallel = 'parallel simultaneous runway operations in progress independent departures in progress';
+			let wind = [0, 0];
+			let r = '';
+			let rShorthand = '';
+			if (service.rwyWindOK(160, winddir, windstrength, 20, -5)) {
+				rShorthand = "16L and 16R for arrivals and departures";
+				r = "one six left and right";
+				rwy = "runways " + r + " " + std + ' ' + stdParallel;
+				wind = service.getXTWind(160, winddir, windstrength);
+				service.arrivals = '16L, 16R';
+				service.departures = '16L, 16R';
+				service.circuits = '';
+			} else if (service.rwyWindOK(340, winddir, windstrength, 20, -5)) {
+				rShorthand = "34L and 34R for arrivals and departures";
+				r = "three four left and right";
+				rwy = "runways " + r + " " + std + ' ' + stdParallel;
+				wind = service.getXTWind(340, winddir, windstrength);
+				service.arrivals = '34L, 34R';
+				service.departures = '34L, 34R';
+				service.circuits = '';
+			} else if (service.rwyWindOK(70, winddir, windstrength, 20, -5)) {
+				rShorthand = "07 for arrivals and departures";
+				r = "zero seven";
+				rwy = "runway " + r + " " + std;
+				wind = service.getXTWind(70, winddir, windstrength);
+				service.arrivals = '07';
+				service.departures = '07';
+				service.circuits = '';
+			} else if (service.rwyWindOK(250, winddir, windstrength, 20, -5)) {
+				rShorthand = "25 for arrivals and departures";
+				r = "two five";
+				rwy = "runway " + r + " " + std;
+				wind = service.getXTWind(250, winddir, windstrength);
+				service.arrivals = '25';
+				service.departures = '25';
+				service.circuits = '';
+			} else {
+				rShorthand = "16L and 16R for arrivals and departures";
+				r = "one six left and right";
+				rwy = "runways " + r + " " + std + ' ' + stdParallel;
+				wind = service.getXTWind(160, winddir, windstrength);
+				service.arrivals = '16L, 16R';
+				service.departures = '16L, 16R';
+				service.circuits = '';
 			}
-		]
+			service.maxXwind = [0, service.arrivals];
+			service.maxTwind = [0, service.arrivals];
+			if (wind[0] > 12) {
+  				service.maxXwind = [wind[0], service.arrivals];
+			}
+			if (wind[1] < 0) {
+  				service.maxTwind = [Math.abs(wind[0]), service.arrivals];
+			}
+			return [r, rwy, rShorthand];
+	       	}
 	},
   	'YSCN': {
 		name: 'Camden',
 		services: ['tower', 'ground'],
+		imcApproach: 'instrument approach',
 		allowSpecialVFR: true,
 		circuitsLikely: true,
+		runways: ['06', '24', '10', '28'],
 		localSpecialities: [
 			{ item: 'Gliding operations in progress',
 				wxConditions: 'VFR',
@@ -66,38 +115,70 @@ export class AerodromesService {
 			       	prob: 0.50
 			}
 		],
-		runways: [
-			{
-				'name': 'zero six',
-				'sname': '06',
-				'dir': 60,
-				'extra': 'for arrivals and departures'
-			},
-			{
-				'name': 'two four',
-				'sname': '24',
-				'dir': 240,
-				'extra': 'right hand circuits for arrivals and departures'
-			},
-			{
-				'name': 'one zero',
-				'sname': '10',
-				'dir': 110,
-				'extra': 'in use'
-			},
-			{
-				'name': 'two eight',
-				'sname': '28',
-				'dir': 280,
-				'extra': 'in use'
+		runwayLogic: function(winddir: number, windstrength: number, service: any): [string, string, string] { 
+			let rwy = '';
+			let wind = [0, 0];
+			let r = '';
+			let rShorthand = '';
+			if (service.rwyWindOK(60, winddir, windstrength, 8, -3)) {
+				rShorthand = "06";
+				r = "zero six";
+				rwy = "runway " + r;
+				wind = service.getXTWind(60, winddir, windstrength);
+				service.arrivals = '06';
+				service.departures = '06';
+				service.circuits = '06';
+			} else if (service.rwyWindOK(240, winddir, windstrength, 8, -3)) {
+				rShorthand = "24";
+				r = "two four";
+				rwy = "runway " + r;
+				wind = service.getXTWind(240, winddir, windstrength);
+				service.arrivals = '24';
+				service.departures = '24';
+				service.circuits = '24';
+			} else if (service.rwyWindOK(100, winddir, windstrength, 8, -3)) {
+				rShorthand = "10";
+				r = "one zero";
+				rwy = "runway " + r;
+				wind = service.getXTWind(100, winddir, windstrength);
+				service.arrivals = '10';
+				service.departures = '10';
+				service.circuits = '10';
+			} else if (service.rwyWindOK(280, winddir, windstrength, 8, -3)) {
+				rShorthand = "28";
+				r = "two eight";
+				rwy = "runway " + r;
+				wind = service.getXTWind(280, winddir, windstrength);
+				service.arrivals = '28';
+				service.departures = '28';
+				service.circuits = '28';
+			} else {
+				rShorthand = "06";
+				r = "zero six";
+				rwy = "runway " + r;
+				wind = service.getXTWind(60, winddir, windstrength);
+				service.arrivals = '06';
+				service.departures = '06';
+				service.circuits = '06';
 			}
-		]
+			service.maxXwind = [0, service.arrivals];
+			service.maxTwind = [0, service.arrivals];
+			if (wind[0] > 8) {
+  				service.maxXwind = [wind[0], service.arrivals];
+			}
+			if (wind[1] < 0) {
+  				service.maxTwind = [Math.abs(wind[0]), service.arrivals];
+			}
+			return [r, rwy, rShorthand];
+		}
 	},
   	'YSCB': {
 		name: 'Canberra',
 		services: ['tower', 'ground', 'approach'],
+		imcApproach: 'instrument approach',
 		allowSpecialVFR: false,
 		circuitsLikely: true,
+		runways: ['17', '35', '30', '12'],
 		localSpecialities: [
 			{
 	       			item: 'SIGMET CURRENT FOR SEVere TURBulence forecast between ten thousand feet and flight level two four zero',
@@ -118,65 +199,115 @@ export class AerodromesService {
 				prob: 0.20
 			}
 		],
-		runways: [
-			{
-				'name': 'three fife',
-				'sname': '35',
-				'dir': 350,
-				'extra': 'for arrivals and departures'
-			},
-			{
-				'name': 'one seffen',
-				'sname': '17',
-				'dir': 170,
-				'extra': 'for arrivals and departures'
-			},
-			{
-				'name': 'three zero',
-				'sname': '30',
-				'dir': 300,
-				'extra': 'for arrivals and departures'
-			},
-			{
-				'name': 'one two',
-				'sname': '12',
-				'dir': 120,
-				'extra': 'for arrivals and departures'
+		runwayLogic: function(winddir: number, windstrength: number, service: any): [string, string, string] { 
+			let rwy = '';
+			let wind = [0, 0];
+			let r = '';
+			let rShorthand = '';
+			if (service.rwyWindOK(350, winddir, windstrength, 8, -3)) {
+				rShorthand = "35 for arrivals and departures";
+				r = "three five";
+				rwy = "runway " + r;
+				wind = service.getXTWind(350, winddir, windstrength);
+				service.arrivals = '35';
+				service.departures = '35';
+			} else if (service.rwyWindOK(170, winddir, windstrength, 8, -3)) {
+				rShorthand = "17 for arrivals and departures";
+				r = "one seven";
+				rwy = "runway " + r;
+				wind = service.getXTWind(170, winddir, windstrength);
+				service.arrivals = '17';
+				service.departures = '17';
+			} else if (service.rwyWindOK(300, winddir, windstrength, 8, -3)) {
+				rShorthand = "30 for arrivals and departures";
+				r = "three zero";
+				rwy = "runway " + r;
+				wind = service.getXTWind(300, winddir, windstrength);
+				service.arrivals = '30';
+				service.departures = '30';
+			} else if (service.rwyWindOK(120, winddir, windstrength, 8, -3)) {
+				rShorthand = "12 for arrivals and departures";
+				r = "one two";
+				rwy = "runway " + r;
+				wind = service.getXTWind(120, winddir, windstrength, 8, -3);
+				service.arrivals = '12';
+				service.departures = '12';
+			} else {
+				rShorthand = "35 for arrivals and departures";
+				r = "three five";
+				rwy = "runway " + r;
+				wind = service.getXTWind(350, winddir, windstrength);
+				service.arrivals = '35';
+				service.departures = '35';
 			}
-		]
+			service.circuits = service.arrivals;
+			if (service.rwyWindOK(120, winddir, windstrength, 8, -3)) {
+				service.circuits = '12';
+				rwy += " runway one two in use";
+			} else if (service.rwyWindOK(300, winddir, windstrength, 8, -3)) {
+				service.circuits = '30';
+				rwy += " runway three zero in use";
+			}
+
+			service.maxXwind = [0, service.arrivals];
+			service.maxTwind = [0, service.arrivals];
+			if (wind[0] > 12) {
+  				service.maxXwind = [wind[0], service.arrivals];
+			}
+			if (wind[1] < 0) {
+  				service.maxTwind = [Math.abs(wind[0]), service.arrivals];
+			}
+			return [r, rwy, rShorthand];
+		}
 	},
   	'YSBK': {
 		name: 'Bankstown',
 		services: ['tower', 'ground'],
+		imcApproach: 'instrument approach',
 		allowSpecialVFR: true,
 		circuitsLikely: true,
+		runways: ['29L', '29R, 29C', '11R', '11L, 11C'],
 		localSpecialities: [],
-		runways: [
-			{
-				'name': 'one one left and one one centre',
-				'sname': '11L and 11C',
-				'dir': 110,
-				'extra': 'for arrivals and departures frequency one three two decimal eight'
-			},
-			{
-				'name': 'one one right',
-				'sname': '11R',
-				'dir': 110,
-				'extra': 'for circuit training right hand circuits frequency one two three decimal six'
-			},
-			{
-				'name': 'two niner right and two niner centre',
-				'sname': '29R and 29C',
-				'dir': 290,
-				'extra': 'for arrivals and departures right hand circuits frequency one three two decimal eight'
-			},
-			{
-				'name': 'two niner left',
-				'sname': '29L',
-				'dir': 290,
-				'extra': 'for circuit training frequency one two three decimal six'
+		runwayLogic: function(winddir: number, windstrength: number, service: any): [string, string, string] { 
+			let rwy = '';
+			let wind = [0, 0];
+			let r = '';
+			let rShorthand = '';
+			if (service.rwyWindOK(290, winddir, windstrength, 8, -3)) {
+				rShorthand = "29R and 29C for arrivals and departures 29L for circuit training";
+				r = "two niner right and two niner centre for arrivals and departures two niner left for circuit training";
+				rwy = "runway " + r;
+				wind = service.getXTWind(290, winddir, windstrength);
+				service.arrivals = '29R, 29C';
+				service.departures = '29R, 29C';
+				service.circuits = '29L';
+			} else if (service.rwyWindOK(110, winddir, windstrength, 8, -3)) {
+				rShorthand = "11L and 11C for arrivals and departures 11R for circuit training";
+				r = "one one left and one one centre for arrivals and departures one one right for circuit training";
+				rwy = "runway " + r;
+				wind = service.getXTWind(110, winddir, windstrength);
+				service.arrivals = '11L, 11C';
+				service.departures = '11L, 11C';
+				service.circuits = '11R';
+			} else {
+				r = "two niner right and centre for arrivals and departures two niner left for circuit training";
+				rShorthand = "29R and 29C for arrivals and departures 29L for circuit training";
+				rwy = "runway " + r;
+				wind = service.getXTWind(290, winddir, windstrength);
+				service.arrivals = '29R, 29C';
+				service.departures = '29R, 29C';
+				service.circuits = '29L';
 			}
-		]
+			service.maxXwind = [0, service.arrivals];
+			service.maxTwind = [0, service.arrivals];
+			if (wind[0] > 12) {
+  				service.maxXwind = [wind[0], service.arrivals];
+			}
+			if (wind[1] < 0) {
+  				service.maxTwind = [Math.abs(wind[0]), service.arrivals];
+			}
+			return [r, rwy, rShorthand];
+		}
 	}
   }
 
@@ -185,25 +316,47 @@ export class AerodromesService {
   private windStrength: number = 0;
   private wx: Weather = {} as any;
   private rcount: number = 0;
-  private maxXwind: number = 0;
+  private maxXwind: [number, string] = [0, ''];
+  private maxTwind: [number, string] = [0, ''];
   private arrivals = '';
   private departures = '';
   private circuits = '';
   private circuitsLikely: boolean = false;
   private noCircuits: boolean = false;
+  private currentAd: any;
+  private rwyShorthand: string = '';
 
-  constructor() { }
+  constructor(private weatherService: WeatherService) { }
 
   setAd(ad: string) {
   	this.ad = ad;
+	this.currentAd = this.knownAds[this.ad];
   	this.circuitsLikely = this.knownAds[this.ad].circuitsLikely;
-  	this.maxXwind = 0;
 	this.arrivals = '';
 	this.departures = '';
 	this.circuits = '';
   	this.rcount = 0;
   	this.windDir = 0;
 	this.windStrength = 0;
+  }
+
+  getApproach(): string {
+	if (this.weatherService.isIMC()) {
+		return this.currentAd['imcApproach'];
+	}
+  	return '';
+  }
+
+  getRunwaySurface(): string {
+	return this.weatherService.getGroundCondition();
+  }
+
+  getRunwayOperations(): string {
+  	return '-x-';
+  }
+
+  getHolding(): string {
+  	return '-x-';
   }
 
   setWind(windDir: number, windStrength: number) {
@@ -216,7 +369,6 @@ export class AerodromesService {
 
   setWx(wx: Weather) {
   	this.wx = wx;
-  	this.maxXwind = 0;
 	this.arrivals = '';
 	this.departures = '';
 	this.circuits = '';
@@ -267,6 +419,7 @@ export class AerodromesService {
 
   shorthand(st: string) : string {
   	st = st.replace(/domestic/ig, 'dom');
+  	st = st.replace(/domestic/ig, 'ccts');
   	st = st.replace(/departures/ig, 'deps');
   	st = st.replace(/arrivals/ig, 'arr');
   	st = st.replace(/wollongong/ig, 'WOL');
@@ -326,72 +479,97 @@ export class AerodromesService {
   	return Object.keys(this.knownAds);
   }
 
+  getRelAngle(rwyAng: number, windAng: number): number {
+	  let relAng = Math.abs(rwyAng - windAng);
+	  if (relAng > 180) {
+		  relAng = 360 - relAng;
+	  }
+	  return relAng;
+  }
+
+  getRunwayShorthand(): string {
+	return this.rwyShorthand;
+  }
+
+  getActiveRunwaysAsText() : string {
+	let rwys = this.currentAd.runwayLogic(this.windDir, this.windStrength, this);
+  	return rwys[2];
+  }
+
   getActiveRunways() : string {
-	let rwysSt: string[] = [];
-  	let rwys = this.knownAds[this.ad].runways;
 	this.arrivals = this.departures = this.circuits = '';
-  	this.maxXwind = 0;
-	for (let i = 0; i < rwys.length; i++) {
-		let rwy = rwys[i];
-		let relAng = Math.abs(rwy.dir - this.windDir);
-		if (relAng > 180) {
-			relAng = 360 - relAng;
-		}
-		if (relAng < 90) {
-			let st = 'runway ' + rwy.name;
-			if (rwy.extra !== '') {
-				st += ' ' + rwy.extra;
-			}
-			if (st.match(/arrival/i)) {
-				this.arrivals = rwy.sname;
-			}
-			if (st.match(/departure/i)) {
-				this.departures = rwy.sname;
-			}
-			if (st.match(/circuits/i)) {
-				this.circuits = rwy.sname;
-			}
-			
-			rwysSt.push(st);
-			let xw = this.getXWind(rwy.dir, this.windDir, this.windStrength);
-			if (xw > this.maxXwind) {
-				this.maxXwind = xw;
-			}
-		}
-	}
-	if ((this.circuits === '') && (this.circuitsLikely) && (! this.noCircuits)) {
-		this.circuits = this.arrivals;
-	}
-	if (this.noCircuits) {
-		this.circuits = '';
-	}
-	this.rcount = rwysSt.length;
-	return rwysSt.join(', ');
+  	let rwys = this.currentAd.runwayLogic(this.windDir, this.windStrength, this);
+	this.rwyShorthand = this.shorthand(rwys[1]);
+	return rwys[1];
   }
 
   getCircuitsLikely(): boolean {
   	return this.circuitsLikely;
   }
 
+  rwyWindOK(rwyDir: number, windDir: number, windStrength: number, maxX: number, maxT: number): boolean {
+        let wind = this.getXTWind(rwyDir, windDir, windStrength);
+  	return (wind[0] < maxX && wind[1] > maxT );
+  }
+
+  getXTWind(rwyDir, windDir, windStrength): [number, number] {
+  	let xw = this.getXWind(rwyDir, windDir, windStrength);
+  	let tw = this.getTWind(rwyDir, windDir, windStrength);
+	return [xw, tw];
+  }
+
+  getTWind(rwyDir, windDir, windStrength): number {
+  	let relAng = Math.abs(rwyDir - windDir);
+	let tWind = Math.round(windStrength * Math.cos(Math.PI * relAng/180));
+	return tWind;
+  }
   getXWind(rwyDir, windDir, windStrength): number {
   	let relAng = Math.abs(rwyDir - windDir);
 	if (relAng > 180) {
 		relAng = 360 - relAng;
 	}
-	let xWind = Math.round(Math.abs(windStrength * Math.sin(Math.PI * relAng/180)));
+	let xWind = Math.abs(Math.round(Math.abs(windStrength * Math.sin(Math.PI * relAng/180))));
 	return xWind;
   }
 
-  getMaxXwindAsShorthand(): string {
-  	if (this.maxXwind >= 7) {
-  		return 'xw' + this.maxXwind.toString();
+  getMaxTwindAsText(): string {
+  	if (this.maxTwind[0] > 0) {
+  		return 'maximum tailwind ' + this.maxTwind[0].toString() + ' knots runway ' + this.maxTwind[1];
 	} else {
   		return '';
 	}
   }
 
-  getMaxXwind(): number {
+  getMaxXwindAsText(): string {
+  	if (this.maxXwind[0] > 0) {
+  		return 'maximum crosswind ' + this.maxXwind[0].toString() + ' knots runway ' + this.maxXwind[1];
+	} else {
+  		return '';
+	}
+  }
+
+  getMaxXwindAsShorthand(): string {
+  	if (this.maxXwind[0] > 0) {
+  		return 'xw' + this.maxXwind[0].toString() + ' r' + this.maxXwind[1];
+	} else {
+  		return '';
+	}
+  }
+
+  getMaxXwind(): [number, string] {
   	return this.maxXwind;
+  }
+
+  getMaxTwindAsShorthand(): string {
+  	if (this.maxTwind[0] > 0) {
+  		return 'tw' + this.maxTwind[0].toString() + ' r' + this.maxTwind[1];
+	} else {
+  		return '';
+	}
+  }
+
+  getMaxTwind(): [number, string] {
+  	return this.maxTwind;
   }
 
   servicesAsString(): string {

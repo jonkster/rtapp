@@ -28,6 +28,7 @@ export class AtisComponent implements OnInit, OnDestroy {
 	private vis: string = '';
 	private wind: string = '';
 	private weather: string = '';
+	private temp: string = '';
 	private qnh: string = '';
 	private other: string = '';
 
@@ -47,6 +48,7 @@ export class AtisComponent implements OnInit, OnDestroy {
 	private stopQuestions: boolean = false;
 	private speech: boolean = true;
 	private cheat: boolean = false;
+	private shorthand: string = '';
 
 	constructor(private atisService: CommonAtisService,
 			 private aerodromesService: AerodromesService,
@@ -100,17 +102,18 @@ export class AtisComponent implements OnInit, OnDestroy {
 		if (getNew || (this.currentAtis === '')) {
 			this.currentAtis = this.atisService.generateAtis(level);
 		}
+		this.shorthand = this.atisService.getShorthandAtis();
 		this.ident = this.atisService.getCurrentIdent();
 		this.approach = this.atisService.getCurrentApproach();
-		this.rwys = this.atisService.getCurrentRunways().replace(/ and /g, '+');
+		this.rwys = this.atisService.getCurrentRunways().replace(/rwy/g, '');
 		this.wind = this.atisService.getCurrentWind();
 		this.wind += ' ' + this.aerodromesService.getMaxXwindAsShorthand();
 		this.vis = this.atisService.getCurrentVis();
 		this.weather = this.atisService.getCurrentWeather();
 		this.weather += ' ' + this.atisService.getCurrentCloud();
+		this.temp = 'T' + this.atisService.getCurrentTemp();
 		this.qnh = this.atisService.getCurrentQNH();
 		this.other = this.atisService.getCurrentOther();
-		console.log(this.rwys);
 		switch(level) {
 			case 'advanced': 
 				this.speakService.setLang('en-AU');

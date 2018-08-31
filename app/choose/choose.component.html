@@ -1,0 +1,23 @@
+<StackLayout>
+	<StackLayout orientation="horizontal" >
+		<Label class="p-10" text="Select Degree of difficulty" textWrap="true"></Label>
+		<StackLayout class="p-10" *ngFor="let option of userService.getKnownDifficulty()">
+		    <StackLayout orientation="horizontal" verticalAlignment="center">
+			<CheckBox #elem [checked]="getDifficulty() === option" class="checkbox"
+				  (checkedChange)="difficultyChange(elem, option)" boxType="circle"></CheckBox>
+			<StackLayout verticalAlignment="center">
+			    <Label [text]="option" textWrap="true"></Label>
+			</StackLayout>
+		    </StackLayout>
+		</StackLayout>
+	</StackLayout>
+
+	<StackLayout orientation="horizontal" verticalAlignment="center">
+	        <Label class="label font-weight-bold" text="Speak Aloud" textWrap="true" row="0" col="0"></Label>
+		<Switch class="m-15" [checked]="getSpeech()" (checkedChange)="toggleSpeech($event)" row="0" col="1"></Switch>
+	</StackLayout>
+	<Label class="label font-weight-bold" text="Exercises..." textWrap="true" row="0" col="0"></Label>
+	<Button width="200" height="70" class="btn btn-primary" text="Copying ATIS" [nsRouterLink]="['/atis']"></Button>
+	<Button width="200" height="70" class="btn btn-primary" text="Class D procedures" [nsRouterLink]="['/atis']"></Button>
+	<Button width="200" height="70" class="btn btn-primary" text="Controlled Airspace Procedures" [nsRouterLink]="['/atis']"></Button>
+</StackLayout>

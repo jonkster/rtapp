@@ -3,10 +3,12 @@ import { NativeScriptRouterModule } from "nativescript-angular/router";
 import { Routes } from "@angular/router";
 
 import { AtisComponent } from "./atis/atis.component";
+import { ChooseComponent } from "./choose/choose.component";
 
 const routes: Routes = [
-    { path: "", redirectTo: "/atis", pathMatch: "full" },
-    { path: "atis", component: AtisComponent }
+    { path: "", redirectTo: "/choose", pathMatch: "full" },
+    { path: "atis", component: AtisComponent },
+    { path: "choose", component: ChooseComponent }
 ];
 
 @NgModule({

@@ -13,7 +13,7 @@
 	</StackLayout>
 
 
-	<StackLayout orientation="horizontal" >
+	<!--<StackLayout orientation="horizontal" >
 		<Label class="p-10" text="Select Degree of difficulty" textWrap="true"></Label>
 		<StackLayout class="p-10" *ngFor="let option of userService.getKnownDifficulty()">
 		    <StackLayout orientation="horizontal" verticalAlignment="center">
@@ -24,7 +24,7 @@
 			</StackLayout>
 		    </StackLayout>
 		</StackLayout>
-	</StackLayout>
+	</StackLayout>-->
 
 	<StackLayout orientation="horizontal" verticalAlignment="center">
 	        <Label class="label font-weight-bold" text="Speak ATIS" textWrap="true" row="0" col="0"></Label>
@@ -38,33 +38,27 @@
 	</StackLayout>
 
 	<StackLayout orientation="vertical" >
-		<StackLayout orientation="horizontal">
-		    <Label text="ATIS CODE " *ngIf="!cheat"></Label>
-		    <Label [text]="'&nbsp;' + ident + '&nbsp;'" class="rounded" *ngIf="cheat && ident !== ''"></Label>
+		<StackLayout orientation="horizontal" >
+			<Label text="ATIS CODE " *ngIf="!cheat"></Label>
+			<Label [text]="ident" class="pencil" class="rounded" *ngIf="cheat && ident !== ''"></Label>
 		</StackLayout>
-	        <Label [text]="'&nbsp;' + approach + '&nbsp;'" class="pencil" *ngIf="cheat && approach !== ''"></Label>
-		<StackLayout orientation="horizontal">
-		    <Label text="RUNWAY" *ngIf="!cheat"></Label>
-		    <Label [text]="'&nbsp;R' + rwys + '&nbsp;'" class="pencil" *ngIf="cheat && rwys !== ''"></Label>
+		<StackLayout orientation="horizontal" >
+			<TextView [text]="shorthand" class="pencil" *ngIf="cheat && shorthand !== ''" isEditable="false"></TextView>
 		</StackLayout>
-		<StackLayout orientation="horizontal">
-		    <Label text="WIND" *ngIf="!cheat"></Label>
-		    <Label [text]="'&nbsp;' + wind + '&nbsp;'" class="pencil" *ngIf="cheat && wind !== ''"></Label>
+		<StackLayout orientation="horizontal" >
+			<Label text="RUNWAY" *ngIf="!cheat"></Label>
 		</StackLayout>
-		<StackLayout orientation="horizontal">
-		    <Label text="VISIBILITY" *ngIf="!cheat"></Label>
-		    <Label [text]="'&nbsp;' + vis + '&nbsp;'" class="pencil" *ngIf="cheat && vis !== ''"></Label>
+		<StackLayout orientation="horizontal" >
+			<Label text="WIND" *ngIf="!cheat"></Label>
 		</StackLayout>
-		<StackLayout orientation="horizontal">
-		    <Label text="WEATHER" *ngIf="!cheat"></Label>
-		    <Label [text]="'&nbsp;' + weather + '&nbsp;'" class="pencil" *ngIf="cheat && weather !== ''"></Label>
+		<StackLayout orientation="horizontal" >
+			<Label text="VISIBILITY" *ngIf="!cheat"></Label>
 		</StackLayout>
-		<StackLayout orientation="horizontal">
-		    <Label text="QNH" *ngIf="!cheat"></Label>
-		    <Label [text]="'&nbsp;' + qnh + '&nbsp;'" class="pencil" *ngIf="cheat && qnh !== ''"></Label>
+		<StackLayout orientation="horizontal" >
+			<Label text="WEATHER" *ngIf="!cheat"></Label>
 		</StackLayout>
-		<StackLayout orientation="horizontal">
-		    <Label [text]="'&nbsp;' + other + '&nbsp;'" class="pencil" *ngIf="cheat && other !== ''"></Label>
+		<StackLayout orientation="horizontal" >
+			<Label text="QNH" *ngIf="!cheat"></Label>
 		</StackLayout>
 	</StackLayout>
 

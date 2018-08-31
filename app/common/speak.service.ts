@@ -68,6 +68,8 @@ export class CommonSpeakService {
 			this.isSpeaking = true;
 			let text = this.phraseCache.shift();
 			text = text.replace(/CAVOK/, 'CAV O K');
+			text = text.replace(/\bnine\b/ig, 'niner');
+			text = text.replace(/\bfive\b/ig, 'fife');
 			let siht = this;
 			let spkOptions: SpeakOptions = {
 				text: text,

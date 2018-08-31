@@ -72,6 +72,14 @@ private wx: Weather = {} as any;
 	this.setTemp(temp, dewpoint);
   }
 
+  public getCurrentTemp(): string {
+	  let st = this.wx.temp.toString();
+	  if (this.wx.temp - this.wx.dewpoint < 4) {
+	  	st += ' dp ' + this.wx.dewpoint;
+	  }
+  	return st;
+  }
+
   public generateWx() {
   	this.qnhNumber = Math.floor(1023 - (Math.random() * 20));
   	this.wx.qnh = this.toNumbers(this.qnhNumber);
@@ -164,6 +172,28 @@ private wx: Weather = {} as any;
 	return ''
   }
 
+  public visAsText(): string {
+  	let v = this.wx.vis.max.toString() + ' metres';
+  	if (this.wx.vis.max === 9999) {
+		v = 'greater than 10 kilometres';
+	} else if (this.wx.vis.max > 5000) {
+		v = (this.wx.vis.max / 1000).toString() + ' kilometres';
+	}
+
+	if (this.wx.vis.max > this.wx.vis.min) {
+		v += ' reducing to ';
+  		if (this.wx.vis.min === 9999) {
+			v += ' greater than 10 kilometres';
+			} else if (this.wx.vis.min > 5000) {
+			v += (this.wx.vis.min / 1000).toString() + ' kilometres';
+		} else {
+			v += this.wx.vis.min.toString() + ' metres';
+		}
+		v += ' ' + this.wx.vis.comment;
+	}
+	return v;
+   }
+
   public visAsString(): string {
   	let v = this.stNumber(this.wx.vis.max) + ' metres';
   	if (this.wx.vis.max === 9999) {
@@ -224,6 +254,28 @@ private wx: Weather = {} as any;
 	}
   }
 
+  windAsText(): string {
+	  if (this.wx.windStrength === 0) {
+	  	return 'calm';
+	  } else if (this.wx.windStrength <= 4) {
+	  	return 'variable';
+	  }
+	  let st = '';
+	  if (this.wx.windDirectionVariation > 0) {
+        	let windDirTo = (this.wx.windDirection + this.wx.windDirectionVariation) % 360;
+	  	st = 'varying between ' + this.wx.windDirection.toString() + ' and ' + windDirTo.toString();
+	  } else {
+	  	st = this.wx.windDirection.toString();
+	  }
+	  st += ' degrees, ';
+	  if (this.wx.windGustStrength > this.wx.windStrength) {
+	  	st += ' minimum ' + this.wx.windStrength.toString() + ' maximum ' + this.wx.windGustStrength.toString()  + ' knots'
+	  } else {
+	  	st += ' ' + this.wx.windStrength.toString() + ' knots'
+	  }
+	  return st;
+  }
+
   windAsString(): string {
 	  if (this.wx.windStrength === 0) {
 	  	return 'calm';
@@ -232,7 +284,7 @@ private wx: Weather = {} as any;
 	  }
 	  let st = '';
 	  if (this.wx.windDirectionVariation > 0) {
-        	let windDirTo = (this.wx.windDirection + this.wx.windDirectionVariation % 360);
+        	let windDirTo = (this.wx.windDirection + this.wx.windDirectionVariation) % 360;
 	  	st = 'varying between ' + this.toNumbers(this.wx.windDirection) + ' and ' + this.toNumbers(windDirTo);
 	  } else {
 	  	st = this.toNumbers(this.wx.windDirection);
@@ -255,7 +307,6 @@ private wx: Weather = {} as any;
 	}
 
 	if (this.wx.vis.max > this.wx.vis.min) {
-	console.log(this.fonticon.css.mdi['mdi-add']);
 		v += "↓";
   		if (this.wx.vis.min === 9999) {
 			v += ' >10k';
@@ -302,6 +353,10 @@ private wx: Weather = {} as any;
 	}
   }
 
+  public qnhAsText(): string {
+  	return this.qnhNumber.toString();
+  }
+
   public qnhAsShorthand(): string {
   	return 'Q' + this.qnhNumber.toString();
   }
@@ -319,13 +374,13 @@ private wx: Weather = {} as any;
   windAsShorthand(): string {
   	let wind = ''
 	  if (this.wx.windStrength === 0) {
-	  	return 'wnd clm';
+	  	return 'clm';
 	  } else if (this.wx.windStrength <= 4) {
-	  	return 'wnd vbl';
+	  	return 'vbl';
 	  }
 	  let st = '';
 	  if (this.wx.windDirectionVariation > 0) {
-        	let windDirTo = (this.wx.windDirection + this.wx.windDirectionVariation % 360);
+        	let windDirTo = (this.wx.windDirection + this.wx.windDirectionVariation) % 360;
 	  	st = this.wx.windDirection + ' - ' + windDirTo;
 	  } else {
 	  	st = this.wx.windDirection.toString();
@@ -396,6 +451,18 @@ private wx: Weather = {} as any;
 	return false;
   }
 
+  cloudAsText() : string {
+  	if (this.wx.cloud.length === 0) {
+		return 'nil';
+	} else {
+		let st = '';
+		for (let i = 0; i < this.wx.cloud.length; i++) {
+			let cloud: Cloud = this.wx.cloud[i];
+			st += ' ' + this.oktasToString(cloud.coverage) + ' ' + cloud.base;
+		}
+		return st;
+	}
+  }
   cloudAsString() : string {
   	if (this.wx.cloud.length === 0) {
 		return 'nil';
