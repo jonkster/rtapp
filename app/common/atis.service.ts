@@ -6,6 +6,7 @@ import { CommonSpeakService } from "../common/speak.service";
 import { AerodromesService } from "../aerodromes/aerodromes.service";
 
 import { AtisInterface } from "./atis.interface";
+import { QuestionInterface } from "./question.interface";
 
 @Injectable()
 export class CommonAtisService {
@@ -85,9 +86,10 @@ export class CommonAtisService {
 	bit = atis.runways;
 	bit = bit.replace(/ and /ig, '+');
 	bit = bit.replace(/ for /ig, '');
-	bit = bit.replace(/ arrivals /ig, 'arr');
-	bit = bit.replace(/ departures /ig, 'dep');
-	bit = bit.replace(/ circuits /ig, 'ccts');
+	bit = bit.replace(/arrivals/ig, 'ar');
+	bit = bit.replace(/departures/ig, 'dp');
+	bit = bit.replace(/circuits/ig, 'ccts');
+	bit = bit.replace(/circuit training/ig, 'ccts');
 	shorthand.push(bit);
 
 	bit = atis.runwaysSurface;
@@ -98,6 +100,12 @@ export class CommonAtisService {
 	shorthand.push(bit);
 
 	bit = atis.runwayOps;
+	bit = bit.replace(/restricted/ig, 'res');
+	bit = bit.replace(/operations/ig, 'ops');
+	bit = bit.replace(/special/ig, 'spec');
+	bit = bit.replace(/procedures/ig, 'procs');
+	bit = bit.replace(/apply/ig, '');
+	bit = bit.replace(/control zone closed for vfr ops/ig, 'v̶f̶r̶');
 	shorthand.push(bit);
 
 	bit = atis.wind;
@@ -189,8 +197,51 @@ export class CommonAtisService {
   		'questions': []
 	} as any;
 	atis.shorthand = this.shorthandAtis(atis);
+	this.makeAtisQuestions(atis);
 	console.log(atis);
 	this.currentAtis = atis;
+  }
+
+  public makeAtisQuestions(atis: AtisInterface) {
+  	this.questionService.addQuestion('what information have you received?', atis.ident,
+				['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel'],
+				'');
+	if (atis.approach !== '') {
+		this.questionService.addQuestion('If arriving, what sort of approach would you expect?', atis.approach,
+				['visual', 'ils', 'special vfr', 'standard', 'cannot be determined'],
+				'');
+	}
+	this.questionService.addQuestion('What runway would you expect for arrival?', atis.runways, ['06', '34', '11L', '30', '28', '29C or 29R'], '');
+	this.questionService.addQuestion('What is the wind?', atis.wind, ['270/10', '220/10', '120-140/5-10', 'variable 5', 'calm'], '');
+	if (atis.xwind !== '') {
+		this.questionService.addQuestion('What is the maximum cross wind reported?', atis.xwind,
+       				['0', '5', '7', '10', '12', '15'], '');
+	}
+	if (atis.twind !== '') {
+		this.questionService.addQuestion('What is the maximum tail wind reported?', atis.twind,
+				['0', '1', '2', '3', '4', '5'], '');
+	}
+	if (atis.weather === 'CAVOK') {
+		this.questionService.addQuestion('Is there cloud above 5000 feet?', 'possibly yes',
+				['definitely yes', 'definitely no'], "CAVOK means no cloud below 5000' but there can be cloud above this");
+		this.questionService.addQuestion('What is the visibility?', '10km or greater',
+			       	['2000m', '5000m', '8km'], "CAVOK means visibility must be 10km or greater");
+		this.questionService.addQuestion('Could there be Towering Cumulus above the aerodrome?', 'definitely no',
+			       	['definitely yes', 'possibly yes'], "there must be no towering Cumulus if CAVOK");
+		this.questionService.addQuestion('Could there be Stratocumulus above the aerodrome?', 'possibly yes',
+			       	['definitely no', 'definitely yes'], "providing the cloud is above 5000' it can still be CAVOK");
+	} else {
+		this.questionService.addQuestion('What is the visibility?', atis.visibility,
+			['800 metres', '2000 metres', '5000 metres', '8 kilometres', 'greater than 10 kilometres'], "");
+		this.questionService.addQuestion('What is the reported cloud?', atis.cloud,
+			['broken 500', 'scattered 1500', 'few 2500', 'overcast 3000'], "");
+		this.questionService.addQuestion('Could there be unreported cloud at 6000?', 'yes',
+			['no'], "ATIS will only report cloud below 5000' (unless CB or TCU)");
+	}
+	this.questionService.addQuestion('What is the temperature?', atis.temp.toString(),
+			       	['10', '13', '14', '15', '20', '22', '23', '25', '28', '30', '32'], "");
+	this.questionService.addQuestion('What is the QNH?', atis.qnh,
+			       	['1001', '1003', '1004', '1005', '1010', '1012', '1013', '1014', '1015', '1017', '1020'], "");
   }
 
   public windAsWords(st: string) : string {
@@ -224,9 +275,9 @@ export class CommonAtisService {
   }
 
   public runwaysAsWords(st: string) : string {
-  	st = st.replace(/L/ig, ' left');
-  	st = st.replace(/R/ig, ' right');
-  	st = st.replace(/C/ig, ' centre');
+  	st = st.replace(/L/g, ' left');
+  	st = st.replace(/R/g, ' right');
+  	st = st.replace(/C/g, ' centre');
   	st = st.replace(/0/g, ' zero');
   	st = st.replace(/1/g, ' one');
   	st = st.replace(/2/g, ' two');
@@ -237,6 +288,7 @@ export class CommonAtisService {
   	st = st.replace(/7/g, ' seven');
   	st = st.replace(/8/g, ' eight');
 	st = st.replace(/9/g, ' nine');
+	st = st.replace(/\./g, ' decimal');
 	return st;
   }
 
@@ -289,134 +341,6 @@ export class CommonAtisService {
 	let words = this.atisAsWords();
 	console.log(words);
 	return words;
-	/*
-
-  	let wx:Weather = this.weatherService.createNewWeather();
-  	let adName = this.aerodromesService.getName();
-  	this.aerodromesService.setWind(wx.windDirection, wx.windStrength);
-  	let ident = this.getIdent();
-  	let atis: string[] = [];
-	this.approach = '';
-
-	this.questionService.clearQuestions();
-	this.questionService.addQuestion('what information have you received?', ident, ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot'], '');
-
-	atis.push(adName);	
-	atis.push('terminal information');	
-	atis.push(ident);	
-	this.aerodromesService.setNoCircuits(false);
-	if (this.weatherService.isIMC()) {
-		this.approach = 'instrument approach';
-		atis.push('expect instrument approach');
-		this.questionService.addQuestion('If arriving, what sort of approach would you expect?', "instrument", ['visual', 'special vfr', 'standard', 'cannot be determined'], 'atis says expect instrument approach');
-		if (this.aerodromesService.getAllowSpecialVFR()) {
-			if (this.weatherService.isRVFR()) {
-				this.questionService.addQuestion('For fixed wing VFR aircraft, what is the minimum visibilty you should maintain?', "1600m", ['800m', '2000m', '5000m', '8km', 'none - you cannot operate VFR'], 'special VFR procedures - you must maintain 1600m visibility');
-				atis.push('special V F R procedures apply')
-				this.approach += ' spec vfr';
-				this.aerodromesService.setNoCircuits(true);
-			}
-		}
-	} else {
-		this.questionService.addQuestion('If arriving, what sort of approach would you most likely expect?', "visual", [ 'instrument', 'ils', 'special vfr', 'standard', 'cannot be determined'], 'no mention is made of specific approaches so probably visual');
-	}
-	if (this.aerodromesService.getAllowSpecialVFR()) {
-		if (! this.weatherService.isVFR()) {
-			this.aerodromesService.setNoCircuits(true);
-			atis.push('control zone closed for V F R operations');
-			this.approach += ' no vfr';
-			this.questionService.addQuestion('For fixed wing VFR aircraft, what is the minimum visibilty you should maintain?', "none - you cannot operate VFR", ['800m', '2000m', '5000m', '8km', 'none - you cannot operate VFR'], 'the zone is closed for VFR operations');
-		}
-	}
-	atis.push(',');	
-	atis.push(this.aerodromesService.getActiveRunways());
-	let rwyOptsA = this.aerodromesService.getRunways();
-	let rwyOptsD = this.aerodromesService.getRunways();
-	let rwyOptsCircuits = this.aerodromesService.getRunways();
-	this.questionService.addQuestion('Which runway would you expect for an arrival', this.aerodromesService.getArrivalRunway(), rwyOptsA, '');
-	this.questionService.addQuestion('Which runway would you expect for a departure', this.aerodromesService.getDepartureRunway(), rwyOptsD, '');
-	rwyOptsCircuits.push('circuits not available');
-	if (this.aerodromesService.getCircuitsLikely()) {
-		this.questionService.addQuestion('Which runway would you expect for circuits', this.aerodromesService.getCircuitRunway(), rwyOptsCircuits, '');
-	} else {
-		this.questionService.addQuestion('Which runway would you expect for circuits', 'you would be unlikely to be allowed circuits', rwyOptsCircuits, '');
-	}
-if (this.weatherService.getGroundCondition() !== '') {
-		atis.push(',');	
-		if (this.aerodromesService.multipleRunways()) {
-			atis.push('runways')
-		} else {
-			atis.push('runway')
-		}
-		atis.push(this.weatherService.getGroundCondition());
-	}
-	atis.push(',');	
-	atis.push('wind ');
-	atis.push(this.weatherService.windAsString());
-	let maxXwind = this.aerodromesService.getMaxXwind();
-	if (maxXwind[0] > 0) {
-	atis.push('cross wind maximum ' + this.toNumbers(maxXwind[0]) + ' knots runway ' + maxXwind[1]);
-	this.questionService.addQuestion('What is the maximum cross wind reported?', maxXwind[0].toString(), ['0', '5', '7', '10', '12', '15'], '');
-}
-let maxTwind = this.aerodromesService.getMaxTwind();
-if (maxTwind[0] > 0) {
-	atis.push('tail wind maximum ' + this.toNumbers(maxTwind[0]) + ' knots runway ' + maxTwind[1]);
-	this.questionService.addQuestion('What is the maximum tail wind reported?', maxTwind[0].toString(), ['0', '1', '2', '3', '4', '5'], '');
-}
-	
-atis.push(',');	
-if (! this.weatherService.isCAVOK()) {
-	atis.push('visibility');	
-	atis.push(this.weatherService.visAsString());
-	atis.push(',');	
-} else {
-	this.questionService.addQuestion('Is there cloud above 5000 feet?', 'possibly yes', ['definitely yes', 'definitely no'], "CAVOK means no cloud below 5000, there could be cloud above this'");
-	this.questionService.addQuestion('What is the visibility?', '10km or greater', ['2000m', '5000m', '8km'], "CAVOK means visibility must be 10km or greater");
-	this.questionService.addQuestion('Could there be Towering Cumulus above the aerodrome?', 'no', ['yes'], "there must be no towering Cumulus if CAVOK");
-	this.questionService.addQuestion('Could there be Stratocumulus above the aerodrome?', 'yes', ['no'], "providing the cloud is above 5000' it can still be CAVOK");
-}
-atis.push('weather');	
-atis.push(this.weatherService.weatherAsString());
-atis.push(',');	
-if (! this.weatherService.isFOG()) {
-	if (! this.weatherService.isCAVOK()) {
-		atis.push('cloud');	
-		atis.push(this.weatherService.cloudAsString());
-		atis.push(',');	
-	}
-}
-atis.push('temperature');	
-atis.push(this.toNumbers(wx.temp));
-if ((wx.temp - wx.dewpoint) < 4) {
-	atis.push('dewpoint');
-	atis.push(this.toNumbers(wx.dewpoint));
-	let diff = wx.temp - wx.dewpoint;
-	if (diff > 0) {
-	this.questionService.addQuestion('Would a drop in temperature by ' + diff + 'degrees matter for visibility?', 'yes', [ 'no' ], 'the dewpoint is within ' + diff + ' degrees of the air temperature - dropping temperature could result in cloud forming');
-	}
-}
-atis.push(',');	
-atis.push('Q N H');	
-atis.push(wx.qnh);
-this.questionService.addQuestion('What is the QNH?', this.weatherService.qnhNumber.toString(), [ '1009', '1013', '1015', '1005', '1017' ], '');
-atis.push(',');	
-
-let spec: string[] = this.aerodromesService.getSpecialities();
-if (spec.length > 0) {
-	atis.push(spec.join(', '));
-	atis.push(',');	
-}
-atis.push('on first contact with');	
-atis.push(adName);	
-atis.push(this.aerodromesService.servicesAsString());	
-atis.push('notify receipt of information');	
-atis.push(ident);	
-atis.push('.');	
-
-let a = atis.join(' ');
-console.log('>', a);
-return a;
-*/
 }
 
 getIdent() {

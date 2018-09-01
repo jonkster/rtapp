@@ -190,14 +190,14 @@ export class AtisComponent implements OnInit, OnDestroy {
 		};
 		action(options).then((result) => {
 			if (result !== 'Cancel') {
-				let answer = question.q + ' you said: ' + result;
+				let answer = question.q + "\nyou said: " + result +"\n";
 				if (question.c.toLowerCase() === result.toLowerCase()) {
-					answer += ' CORRECT';
+					answer += "\nCORRECT!\n";
 				} else {
-					answer += " - incorrect, should be: " + question.c;
+					answer += "\nincorrect, should be: " + question.c;
 				}
 				if (question.r !== '') {
-					answer += ' (' + question.r + ')';
+					answer += "\n(" + question.r + ')';
 				}
 				this.answeredQuestions.push(answer);
 				this.showAnswer(answer);

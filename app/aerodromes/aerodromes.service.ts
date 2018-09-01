@@ -274,7 +274,7 @@ export class AerodromesService {
 			let r = '';
 			let rShorthand = '';
 			if (service.rwyWindOK(290, winddir, windstrength, 8, -3)) {
-				rShorthand = "29R and 29C for arrivals and departures 29L for circuit training";
+				rShorthand = "29R and 29C for arrivals and departures frequency 132.8 29L for circuit training frequency 123.6";
 				r = "two niner right and two niner centre for arrivals and departures two niner left for circuit training";
 				rwy = "runway " + r;
 				wind = service.getXTWind(290, winddir, windstrength);
@@ -282,7 +282,7 @@ export class AerodromesService {
 				service.departures = '29R, 29C';
 				service.circuits = '29L';
 			} else if (service.rwyWindOK(110, winddir, windstrength, 8, -3)) {
-				rShorthand = "11L and 11C for arrivals and departures 11R for circuit training";
+				rShorthand = "11L and 11C for arrivals and departures frequency 132.8 11R for circuit training frequency 123.6";
 				r = "one one left and one one centre for arrivals and departures one one right for circuit training";
 				rwy = "runway " + r;
 				wind = service.getXTWind(110, winddir, windstrength);
@@ -290,8 +290,7 @@ export class AerodromesService {
 				service.departures = '11L, 11C';
 				service.circuits = '11R';
 			} else {
-				r = "two niner right and centre for arrivals and departures two niner left for circuit training";
-				rShorthand = "29R and 29C for arrivals and departures 29L for circuit training";
+				rShorthand = "29R and 29C for arrivals and departures frequency 132.8 29L for circuit training frequency 123.6";
 				rwy = "runway " + r;
 				wind = service.getXTWind(290, winddir, windstrength);
 				service.arrivals = '29R, 29C';
@@ -352,7 +351,15 @@ export class AerodromesService {
   }
 
   getRunwayOperations(): string {
-  	return '-x-';
+	  if (this.getAllowSpecialVFR()) {
+  		if (this.weatherService.isRVFR()) {
+			return 'restricted vfr operations, special vfr procedures apply';
+		}
+	  	if (this.weatherService.isIMC()) {
+			return 'control zone closed for vfr operations';
+		}
+	}
+	return '';
   }
 
   getHolding(): string {
