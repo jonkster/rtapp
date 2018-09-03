@@ -245,6 +245,9 @@ export class CommonAtisService {
   }
 
   public windAsWords(st: string) : string {
+  	st = st.replace(/L\b/g, ' left');
+  	st = st.replace(/R\b/g, ' right');
+  	st = st.replace(/C\b/g, ' centre');
   	st = st.replace(/0/g, 'zero ');
 	st = st.replace(/1/g, 'one ');
   	st = st.replace(/2/g, 'two ');
@@ -274,6 +277,11 @@ export class CommonAtisService {
 	return st;
   }
 
+  public approachAsWords(st: string) : string {
+	st = st.replace(/ILS/g, 'I L S');
+	return st;
+  }
+
   public runwaysAsWords(st: string) : string {
   	st = st.replace(/L/g, ' left');
   	st = st.replace(/R/g, ' right');
@@ -297,7 +305,7 @@ export class CommonAtisService {
 	let atis = this.currentAtis;
 	aLines.push(atis.ad + ' terminal information ' + atis.ident);	
 	if (atis.approach !== '') {
-		aLines.push('expect ' + atis.approach);
+		aLines.push('expect ' + this.approachAsWords(atis.approach));
 	}
 	aLines.push('runway ' + this.runwaysAsWords(atis.runways));
 

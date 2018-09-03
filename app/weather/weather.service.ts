@@ -62,6 +62,16 @@ private wx: Weather = {} as any;
 	let windGustStrength = Math.floor(Math.random() * 10);
 	let windDirection = Math.floor(Math.random() * 36) * 10;
 	let windDirectionVariation = Math.floor(Math.random() * 4) * 10;
+
+	let toDir = windDirection + windDirectionVariation;
+	if (toDir === 0) {
+		windDirectionVariation += 10;
+	}
+
+	if (windDirection === 0) {
+		windDirection = 360;
+	}
+
 	this.setWind(windDirection, windDirectionVariation, windStrength, windGustStrength);
   }
 
@@ -82,7 +92,7 @@ private wx: Weather = {} as any;
 
   public generateWx() {
   	this.qnhNumber = Math.floor(1023 - (Math.random() * 20));
-  	this.wx.qnh = this.toNumbers(this.qnhNumber);
+  	this.wx.qnh = this.toNumbers(this.qnhNumber, 4);
 	this.wx.cloud = [];
   	this.generateWind();
   	this.generateTemp();
@@ -142,7 +152,7 @@ private wx: Weather = {} as any;
 
   public generateCloud() {
   	let layers = Math.round(Math.random() * 3);
-	let alts = [ 800, 1500, 2000, 2500, 3000, 3500, 4000, 5000, 7000 ];
+	let alts = [ 800, 1500, 2000, 2500, 3000, 3500, 4000, 4500 ];
 	this.wx.cloud = [];
 	let coverage = Math.round(Math.random() * 8);
 	for (let i = 0; i < layers; i++) {
@@ -222,17 +232,17 @@ private wx: Weather = {} as any;
 	}
         let digits: string[] = n.toString().split('');
    	if (n >= 1000) {
-		let nst = this.toNumbers(Number(digits[0])) + ' thousand';
+		let nst = this.toNumbers(Number(digits[0]), 1) + ' thousand';
 		if (digits[1] !== '0') {
-			nst += ' ' + this.toNumbers(Number(digits[1])) + ' hundred';
+			nst += ' ' + this.toNumbers(Number(digits[1]), 1) + ' hundred';
 		}
 		return nst;
 		
 	} else if (n >= 100) {
-		let nst = this.toNumbers(Number(digits[0])) + ' hundred';
+		let nst = this.toNumbers(Number(digits[0]), 1) + ' hundred';
 		return nst;
 	} else {
-		let nst = this.toNumbers(n);
+		let nst = this.toNumbers(n, 1);
 	}
   }
 
@@ -258,14 +268,24 @@ private wx: Weather = {} as any;
 	  if (this.wx.windStrength === 0) {
 	  	return 'calm';
 	  } else if (this.wx.windStrength <= 4) {
-	  	return 'variable';
+	  	return 'variable ' + this.wx.windStrength.toString() + ' knots';
 	  }
 	  let st = '';
+	  let toLead = '';
+	  let fromLead = '';
+	  if (this.wx.windDirection < 100) 
+	  {
+		fromLead = '0';
+	  }
 	  if (this.wx.windDirectionVariation > 0) {
         	let windDirTo = (this.wx.windDirection + this.wx.windDirectionVariation) % 360;
-	  	st = 'varying between ' + this.wx.windDirection.toString() + ' and ' + windDirTo.toString();
+		if (windDirTo < 100) 
+		{
+			toLead = '0';
+		}
+	  	st = 'varying between ' + fromLead + this.wx.windDirection.toString() + ' and ' + toLead + windDirTo;
 	  } else {
-	  	st = this.wx.windDirection.toString();
+	  	st = fromLead + this.wx.windDirection.toString();
 	  }
 	  st += ' degrees, ';
 	  if (this.wx.windGustStrength > this.wx.windStrength) {
@@ -280,20 +300,20 @@ private wx: Weather = {} as any;
 	  if (this.wx.windStrength === 0) {
 	  	return 'calm';
 	  } else if (this.wx.windStrength <= 4) {
-	  	return 'variable';
+	  	return 'variable ' + this.wx.windStrength.toString() + ' knots';
 	  }
 	  let st = '';
 	  if (this.wx.windDirectionVariation > 0) {
         	let windDirTo = (this.wx.windDirection + this.wx.windDirectionVariation) % 360;
-	  	st = 'varying between ' + this.toNumbers(this.wx.windDirection) + ' and ' + this.toNumbers(windDirTo);
+	  	st = 'varying between ' + this.toNumbers(this.wx.windDirection, 3) + ' and ' + this.toNumbers(windDirTo, 3);
 	  } else {
-	  	st = this.toNumbers(this.wx.windDirection);
+	  	st = this.toNumbers(this.wx.windDirection, 3);
 	  }
 	  st += ' degrees, ';
 	  if (this.wx.windGustStrength > this.wx.windStrength) {
-	  	st += ' minimum ' + this.toNumbers(this.wx.windStrength) + ' maximum ' + this.toNumbers(this.wx.windGustStrength)  + ' knots'
+	  	st += ' minimum ' + this.toNumbers(this.wx.windStrength, 1) + ' maximum ' + this.toNumbers(this.wx.windGustStrength, 1)  + ' knots'
 	  } else {
-	  	st += ' ' + this.toNumbers(this.wx.windStrength) + ' knots'
+	  	st += ' ' + this.toNumbers(this.wx.windStrength, 1) + ' knots'
 	  }
 	  return st;
   }
@@ -484,7 +504,7 @@ private wx: Weather = {} as any;
 	}
   }
 
-   public toNumbers(n: number) : string {
+   public toNumbers(n: number, digits: number) : string {
    	let map = {
 		'0': 'zero',
 		'1': 'wun',
@@ -500,15 +520,20 @@ private wx: Weather = {} as any;
    	let nst = n.toString();
 	let d = nst.split('');
 	let response: string[] = [];
+	console.log(d, digits);
+	if (d.length < digits) {
+		response.push('zero');
+	}
 	for (let i = 0; i < d.length; i++) {
 		let dst = d[i];
 		let dPhon = map[dst];
 		if (dPhon !== undefined) {
 			response.push(dPhon);
 		} else {
-		response.push(dst);
+			response.push(dst);
 		}
 	}
+	console.log('got', response);
 	return response.join(' ');
    }
 

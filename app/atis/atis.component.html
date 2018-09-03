@@ -1,5 +1,5 @@
-<ScrollView>
-<StackLayout>
+<ScrollView class="backgroundStearman">
+<StackLayout class="easyRead">
 	<StackLayout orientation="horizontal" >
 		<Label class="p-10" text="Select Location" textWrap="true"></Label>
 		<StackLayout class="p-10" *ngFor="let option of knownAds">
@@ -11,6 +11,7 @@
 			</StackLayout>
 		    </StackLayout>
 		</StackLayout>
+		<Button width="200" height="50" class="btn btn-primary" text="Main Menu" [nsRouterLink]="['/choose']"></Button>
 	</StackLayout>
 
 

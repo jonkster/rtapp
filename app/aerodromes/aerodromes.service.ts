@@ -522,6 +522,7 @@ export class AerodromesService {
   getXTWind(rwyDir, windDir, windStrength): [number, number] {
   	let xw = this.getXWind(rwyDir, windDir, windStrength);
   	let tw = this.getTWind(rwyDir, windDir, windStrength);
+	//console.log('rwy', rwyDir, windDir, '@', windStrength, 'xw=', xw, 'tw=', tw);
 	return [xw, tw];
   }
 
@@ -585,7 +586,7 @@ export class AerodromesService {
 	for (let i = 0; i < services.length - 1; i++) {
 		stA.push(services[i]);
 	}
-	let st = stA.join(', ');
+	let st = stA.join(' ');
 	st += ' or ' + services[services.length - 1];
   	return st;
   }

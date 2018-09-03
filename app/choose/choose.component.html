@@ -1,5 +1,6 @@
-<StackLayout>
-	<StackLayout orientation="horizontal" >
+<ScrollView class="backgroundStaggerwing">
+<StackLayout class="easyRead" >
+	<StackLayout orientation="horizontal">
 		<Label class="p-10" text="Select Degree of difficulty" textWrap="true"></Label>
 		<StackLayout class="p-10" *ngFor="let option of userService.getKnownDifficulty()">
 		    <StackLayout orientation="horizontal" verticalAlignment="center">
@@ -18,6 +19,7 @@
 	</StackLayout>
 	<Label class="label font-weight-bold" text="Exercises..." textWrap="true" row="0" col="0"></Label>
 	<Button width="200" height="70" class="btn btn-primary" text="Copying ATIS" [nsRouterLink]="['/atis']"></Button>
-	<Button width="200" height="70" class="btn btn-primary" text="Class D procedures" [nsRouterLink]="['/atis']"></Button>
-	<Button width="200" height="70" class="btn btn-primary" text="Controlled Airspace Procedures" [nsRouterLink]="['/atis']"></Button>
+	<Button width="200" height="70" class="btn btn-primary" text="Class D procedures" [nsRouterLink]="['/classd']"></Button>
+	<Button width="200" height="70" class="btn btn-primary" text="Controlled Airspace Procedures" [nsRouterLink]="['/classc']"></Button>
 </StackLayout>
+</ScrollView>

@@ -73,10 +73,13 @@ export class AtisComponent implements OnInit, OnDestroy {
 
 	showHelp() {
 		let instructions = "This exercise is to develop your ability to confidently copy and understand ATIS transmissions.\n" +
+				"The aim is to be able to quickly and accurately extract the information you need.\n" +
 				"Instructions:\n" +
-				"Get the ATIS, (repeat if necessary until you are confident you have understood it).\n" +
-				"Then, answer the questions." +
-				"The aim is to be able to quickly and accurately extract the information you need.\n";
+				"1. Grab a pencil and some scrap paper.\n" +
+				"2. Press 'Get New ATIS', listen to the ATIS and practice copying it down, (repeat if necessary until you are confident you have understood it).\n" +
+				"3. Once copied try answering the questions.\n" +
+				"4. repeat!\n" +
+				"An example shortand for the ATIS can be displayed by pressing the 'Cheat' button - you do not have to use this format for jotting down the ATIS - it is just a suggestion.\n";
 		let options = {
 		    title: 'Instructions',
 		    message: instructions,

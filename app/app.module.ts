@@ -7,6 +7,8 @@ import { AppRoutingModule } from "./app.routing";
 import { AppComponent } from "./app.component";
 import { AtisComponent } from "./atis/atis.component";
 import { ChooseComponent } from "./choose/choose.component";
+import { ClassCComponent } from "./classc/classc.component";
+import { ClassDComponent } from "./classd/classd.component";
 
 import { AerodromesService } from "./aerodromes/aerodromes.service";
 import { CommonSpeakService } from "./common/speak.service";
@@ -34,7 +36,9 @@ import { NativeScriptFormsModule } from "nativescript-angular/forms";
     declarations: [
         AppComponent,
 	AtisComponent,
-	ChooseComponent
+	ChooseComponent,
+	ClassCComponent,
+	ClassDComponent
     ],
     providers: [
         AerodromesService,

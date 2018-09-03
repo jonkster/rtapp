@@ -14,3 +14,22 @@ refer to http://docs.nativescript.org/ui/theme.
 .mdi {
   font-family: "Material Icons", "MaterialIcons-Regular";
 }
+
+.backgroundStearman {
+    background-image: url("res://stearman");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.backgroundStaggerwing {
+    background-image: url("res://staggerwing");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.easyRead {
+	background-color: white;
+	opacity: 0.7;
+}
