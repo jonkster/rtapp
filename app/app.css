@@ -15,6 +15,20 @@ refer to http://docs.nativescript.org/ui/theme.
   font-family: "Material Icons", "MaterialIcons-Regular";
 }
 
+.backgroundPanel {
+    background-image: url("res://panel");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.backgroundILS {
+    background-image: url("res://panel2");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
 .backgroundStearman {
     background-image: url("res://stearman");
     background-repeat: no-repeat;
@@ -32,4 +46,20 @@ refer to http://docs.nativescript.org/ui/theme.
 .easyRead {
 	background-color: white;
 	opacity: 0.7;
+}
+
+.pencil {
+	color: #0005ff;
+	text-color: #0005ff;
+	font-style: italic;
+	font-size: 20;
+}
+.rounded {
+	border-width: 3;
+	border-color: #0005ff;
+	border-radius: 20;
+	color: #0005ff;
+	text-color: gray;
+	font-style: italic;
+	font-size: 20;
 }

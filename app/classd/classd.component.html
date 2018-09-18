@@ -1,4 +1,19 @@
-<StackLayout>
-  <Label class="h1 title"
-    text="classd Is working"></Label>
+<ScrollView class="backgroundPanel">
+<StackLayout class="easyRead">
+	        <Label class="label font-weight-bold" text="Speak ATIS" textWrap="true" row="0" col="0"></Label>
+                                <Switch class="m-15" [checked]="getSpeech()" (checkedChange)="toggleSpeech($event)" row="0" col="1"></Switch>
+		<Button width="200" height="50" class="btn btn-primary" text="Get New ATIS"
+						 (tap)="atis(true)"></Button>
+		<Button width="200" height="50" class="btn btn-primary" text="Repeat ATIS"
+						 (tap)="atis(false)"></Button>
+		<Button width="200" height="50" class="btn btn-primary" text="Cheat"
+						 (tap)="cheat = ! cheat"></Button>
+		<StackLayout orientation="horizontal"  class="easyRead">
+			<Label text="ATIS CODE " *ngIf="!cheat"></Label>
+			<Label [text]="ident" class="pencil" class="rounded" *ngIf="cheat && ident !== ''"></Label>
+		</StackLayout>
+		<StackLayout orientation="horizontal" >
+			<TextView [text]="shorthand" class="pencil" *ngIf="cheat && shorthand !== ''" isEditable="false"></TextView>
+		</StackLayout>
 </StackLayout>
+</ScrollView>
